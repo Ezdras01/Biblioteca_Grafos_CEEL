@@ -209,6 +209,29 @@ g.guardar("g.dot", shape="circle", layout="fdp")
 #manda a llamar a la funcion para generar el png
 generarPng("g.dot", "g")
 
+def dfsybfs(Grafo, n, mode):
+    op = int(input(
+        
+        a)BFS 
+        b)DFS iterativo y recursivo
+    switch2(op, Grafo, n, mode)
+
+def switch2(op, Grafo, n, mode):
+    'Dame los parametros'
+    if op == 1:
+        BFS(Grafo, n, mode)
+        dfsybfs(Grafo, n, mode)
+    elif op == 2:
+        DFS(Grafo, n, mode)
+        dfsybfs(Grafo, n, mode)
+    elif op == 3:
+        return
+    else:
+        dfsybfs(Grafo, n, mode)
+  
+pedir()
+
+
 
 #sustituye las 2 lineas para generar el grafo deseado 
 
