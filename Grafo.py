@@ -48,6 +48,6 @@ class Grafo:
             for n in self.nodos.values():
                 f.write(str(n.id) + f'[label="" shape={shape}]\n')
             for a in self.aristas.values():
-                f.write(str(a.nodo1.id) + (" -> " if self.dirigido else " -- ") + str(a.nodo2.id) + '\n')
+                f.write(str(a.nodo1.id) + (" -> " if self.dirigido else " -> ") + str(a.nodo2.id) + '\n')
 
             f.write("}\n")

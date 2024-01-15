@@ -1,0 +1,148 @@
+import pygame
+import math
+import random
+
+class Node:
+    def __init__(self):
+        self.edges = []
+        self.pos = [random.uniform(50, 750), random.uniform(50, 550)]
+
+class Edges:
+    def __init__(self, node1, node2, weight):
+        self.nodes = (node1, node2)
+        self.weight = weight
+
+class Grafo:
+    def __init__(self):
+        self.nodes = {}
+        self.edges = []
+
+    def addNode(self, name):
+        if name not in self.nodes:
+            self.nodes[name] = Node()
+
+    def addEdge(self, source, target, directed=False, auto=False, weight=None):
+        if auto is False:
+            buc = source == target
+        else:
+            buc = False
+        name = Edges(source, target, weight or random.randint(1, 100))
+        for edge in self.edges:
+            if directed is False:
+                comp = name != edge
+            else:
+                comp = False
+            if name == edge or buc or comp:
+                return False
+        self.edges.append(name)
+        self.nodes[source].edges.append(target)
+        self.nodes[target].edges.append(source)      
+        return True
+        
+
+    def createGrid(self, rows, cols):
+        for row in range(rows):
+            for col in range(cols):
+                node_name = (row * cols) + col
+                self.addNode(node_name)
+
+                if col > 0:
+                    self.addEdge(node_name, node_name - 1,0)
+
+                if row > 0:
+                    self.addEdge(node_name, node_name - cols,0)
+
+                    # Agregar conexión al vecino derecho
+                    self.addEdge(node_name, node_name - cols + 1,0)
+
+    def Spring(self, c1, c2, c3, c4):
+        listnodes = self.nodes.keys()
+        #print("Edges: ", self.edges)    
+        for node1 in listnodes:
+            force_atrac = [0, 0]
+            force_repel = [0, 0]
+            pos1 = self.nodes[node1].pos
+            vecinos = self.nodes[node1].edges  
+
+            for node2 in listnodes:
+                if node1 == node2:
+                    continue
+                pos2 = self.nodes[node2].pos  
+                distancia = math.dist(pos2, pos1)
+                d = [(pos2[0] - pos1[0]) / distancia, (pos2[1] - pos1[1]) / distancia]
+
+                if node2 in vecinos:
+                    magnitud_atrac = [d[0] * c1 * math.log(distancia / c2), d[1] * c1 * math.log(distancia / c2)]
+                    force_atrac = [magnitud_atrac[0] + force_atrac[0], magnitud_atrac[1] + force_atrac[1]]
+                else:
+                    magnitud_repel = [d[0] * -c3 / math.sqrt(distancia), d[1] * -c3 / math.sqrt(distancia)]
+                    force_repel = [magnitud_repel[0] + force_repel[0], magnitud_repel[1] + force_repel[1]]
+
+            force_total = [(force_atrac[0] + force_repel[0]) * c4, (force_atrac[1] + force_repel[1]) * c4]
+            self.nodes[node1].pos = [pos1[0] + force_total[0], pos1[1] + force_total[1]]
+
+    def draw_graph(self, screen):
+        screen.fill((255, 255, 255))
+        for node, data in self.nodes.items():
+            pos = data.pos
+            pygame.draw.circle(screen, (0, 0, 255), (int(pos[0]), int(pos[1])), 10)
+            pygame.draw.circle(screen, (255, 0, 0), (int(pos[0]), int(pos[1])), 10, 2)
+            font = pygame.font.Font(None, 36)
+            text = font.render(str(node), True, (0, 0, 0))
+            screen.blit(text, (int(pos[0]) - 5, int(pos[1]) - 5))
+
+        for edge in self.edges:
+            start_pos = self.nodes[edge.nodes[0]].pos
+            end_pos = self.nodes[edge.nodes[1]].pos
+            pygame.draw.line(
+                screen, 
+                (0, 0, 0), 
+                    (
+                        int(start_pos[0]), int(start_pos[1])
+                    ),
+                    (
+                        int(end_pos[0]), int(end_pos[1])
+                    ), 2)
+
+        pygame.display.flip()
+
+
+def main():
+    pygame.init()
+
+    # Solicitar al usuario el número de filas y columnas
+    rows = int(input("Ingrese el número de filas: "))
+    cols = int(input("Ingrese el número de columnas: "))
+
+    # Crear un objeto de la clase Grafo
+    grafo = Grafo()
+
+    # Crear una malla de nodos y conectarlos
+    grafo.createGrid(rows, cols)
+    print("Nodes: ", grafo.nodes)
+    print("Edges: ", grafo.edges)
+    
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Visualización de Grafo con Método Spring")
+
+    clock = pygame.time.Clock()
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        # Llamar a la función Spring con los parámetros deseados
+        grafo.Spring(10, 40, 0.25, 2)
+
+        # Dibujar el grafo
+        grafo.draw_graph(screen)
+
+        clock.tick(30)
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
+
