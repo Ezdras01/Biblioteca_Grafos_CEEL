@@ -83,6 +83,7 @@ class Grafo:
 
     def draw_graph(self, screen):
         screen.fill((255, 255, 255))
+        
         for node, data in self.nodes.items():
             pos = data.pos
             pygame.draw.circle(screen, (0, 0, 255), (int(pos[0]), int(pos[1])), 10)
